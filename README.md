@@ -44,7 +44,7 @@ When training large language models with `transformers`' `load_dataset`, you typ
 
 ```python
 # Traditional approach with transformers
-from transformers import load_dataset
+from datasets import load_dataset
 
 dataset = load_dataset("text", data_files="data.jsonl")
 # ❌ Sequences have variable lengths
@@ -68,8 +68,7 @@ PackTron solves all these problems by **packing multiple documents into fixed-le
 
 ```python
 # PackTron approach
-from dataloader import create_dataloader
-from utils.dataset_config import PackTronConfig
+from packtron import create_dataloader, PackTronConfig
 
 config = PackTronConfig(
     train_iters=1000,  # PackTron automatically calculates epochs if data is insufficient
@@ -142,7 +141,7 @@ This ensures:
 Convert your raw text data into PackTron's binary format:
 
 ```bash
-python preprocess_data.py \
+packtron-preprocess \
     --input data.jsonl \
     --output-prefix data \
     --tokenizer-model gpt2 \
@@ -161,7 +160,7 @@ By default, `json_key` is `"text"` and `level` is `"document"` (or `"sentence"` 
 Create a `PackTronConfig` with your training parameters:
 
 ```python
-from utils.dataset_config import PackTronConfig
+from packtron import PackTronConfig
 
 config = PackTronConfig(
     path_to_cache="./cache",           # Cache directory for indices
@@ -180,7 +179,7 @@ config = PackTronConfig(
 Use PackTron's `create_dataloader` function:
 
 ```python
-from dataloader import create_dataloader
+from packtron import create_dataloader
 from transformers import AutoTokenizer
 
 # Initialize tokenizer
@@ -248,15 +247,15 @@ If automatic compilation fails:
 pip install -r requirements.txt
 
 # Manually compile C++ extension
-cd utils/
+cd packtron/utils/
 make
-cd ..
+cd ../..
 ```
 
 ### Verify Installation
 
 ```bash
-python -c "from utils.helpers_cpp import build_sample_idx_int32; print('✓ Installation successful!')"
+python -c "from packtron import create_dataloader, PackTronConfig; print('✓ Installation successful!')"
 ```
 
 For detailed installation instructions, see [INSTALL.md](INSTALL.md).
@@ -312,14 +311,26 @@ class PackTronConfig:
 Factory function to create PackTron DataLoaders:
 
 ```python
+from packtron import create_dataloader
+
 def create_dataloader(
     tokenizer,                  # Tokenizer instance
     config: PackTronConfig,     # PackTron configuration
     rank: int = 0,              # Current process rank
     world_size: int = 1,        # Total number of processes
     consumed_samples: int = 0   # Samples consumed (for checkpoint resuming)
-) -> Tuple[DataLoader, DataLoader]:
+) -> Tuple[DataLoader, Optional[DataLoader]]:
     """Returns (train_dataloader, eval_dataloader)"""
+```
+
+#### `build_tokenizer`
+
+Utility function to build tokenizer:
+
+```python
+from packtron import build_tokenizer
+
+tokenizer = build_tokenizer(args)  # args should have tokenizer_model attribute
 ```
 
 ---

@@ -8,8 +8,6 @@ import math
 import json
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             os.path.pardir)))
 import time
 import gzip
 import glob
@@ -24,8 +22,8 @@ except ImportError:
     PunktLanguageVars = object  # Fallback to the built-in object class
     nltk_available = False
 
-from utils.tokenizer import build_tokenizer, _add_tokenizer_args
-from utils import indexed_dataset
+from packtron.utils.tokenizer import build_tokenizer, _add_tokenizer_args
+from packtron.utils import indexed_dataset
 
 
 class CustomLanguageVars(PunktLanguageVars):

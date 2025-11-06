@@ -50,9 +50,9 @@ If automatic compilation fails, you can manually compile:
 pip install -r requirements.txt
 
 # Manually compile C++ extension
-cd utils/
+cd packtron/utils/
 make
-cd ..
+cd ../..
 ```
 
 ### Method 3: Development Installation
@@ -68,12 +68,12 @@ pip install -e ".[dev]"
 After installation, verify that the C++ extension is compiled:
 
 ```bash
-python -c "from utils.helpers_cpp import build_sample_idx_int32; print('✓ C++ extension loaded successfully')"
+python -c "from packtron.utils.helpers_cpp import build_sample_idx_int32; print('✓ C++ extension loaded successfully')"
 ```
 
 If you see an import error, compile manually:
 ```bash
-cd utils/ && make
+cd packtron/utils/ && make
 ```
 
 ## Troubleshooting
@@ -82,15 +82,15 @@ cd utils/ && make
 
 1. **Check pybind11 is installed**: `pip install pybind11`
 2. **Check compiler is available**: `g++ --version` or `clang++ --version`
-3. **Manually compile**: `cd utils/ && make`
+3. **Manually compile**: `cd packtron/utils/ && make`
 4. **Check error messages**: The setup.py will show detailed error messages
 
 ### Import Errors
 
 If you see import errors for `helpers_cpp`:
 - The C++ extension may not be compiled
-- Run `make -C utils/` to compile manually
-- Check that the `.so` file exists in `utils/` directory
+- Run `make -C packtron/utils/` to compile manually
+- Check that the `.so` file exists in `packtron/utils/` directory
 
 ### Dependency Issues
 
@@ -116,9 +116,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 
 # Compile C++ extension (if not done automatically)
-cd utils/
+cd packtron/utils/
 make
-cd ..
+cd ../..
 ```
 
 ## Next Steps

@@ -5,7 +5,7 @@ This example shows how to use PackTron for efficient sentence packing
 with transformers library to train a LLaMA model in a multi-GPU setup.
 
 Prerequisites:
-1. Preprocess your data using PackTron's preprocess_data.py to generate .bin and .idx files
+1. Preprocess your data using PackTron's preprocessing tool to generate .bin and .idx files
 2. Install required packages: transformers, torch, etc.
 
 Usage (2 GPUs):
@@ -24,13 +24,8 @@ import os
 import argparse
 import logging
 
-# Add parent directory to path to import PackTron modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-from dataloader import create_dataloader
-from utils.dataset_config import PackTronConfig
-from utils.tokenizer import build_tokenizer
-from utils.log import log_single_rank
+# Import PackTron modules
+from packtron import create_dataloader, PackTronConfig, build_tokenizer, log_single_rank
 
 logger = logging.getLogger(__name__)
 

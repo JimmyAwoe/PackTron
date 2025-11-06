@@ -8,8 +8,8 @@ import torch
 from torch.utils.data import DataLoader
 from typing import Optional, List, Tuple
 
-from utils.dataset_config import PackTronConfig
-from utils import (
+from packtron.utils.dataset_config import PackTronConfig
+from packtron.utils import (
     BlendedMegatronDatasetBuilder,
     GPTDataset,
     GPTDatasetConfig,
