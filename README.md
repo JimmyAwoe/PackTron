@@ -393,7 +393,7 @@ Note: This project contains code derived from Megatron-LM (NVIDIA), which is lic
 
 <div align="center">
 
-**Made with ❤️ for the LLM training community**
+**Made with ❤️ for the LLM community**
 
 ⭐ Star this repo if you find it useful!
 
