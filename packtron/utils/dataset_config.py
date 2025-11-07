@@ -2,6 +2,7 @@
 Dataset Configuration Module
 """
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class PackTronConfig:
@@ -30,6 +31,9 @@ class PackTronConfig:
     
     random_seed: int = 1234
     """Random seed for dataset shuffling""" 
+
+    train_curriculum: Optional[str] = None
+    """Optional curriculum schedule string for training dataset (e.g. '0.3 0 0.3 1')"""
     
 
 

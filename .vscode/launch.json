@@ -1,0 +1,54 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PackTron: Run example/llama_train.py",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "torch.distributed.run",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "args": [
+                "--nproc-per-node=2",
+                "example/llama_train.py",
+                "--model-config",
+                "example/llama_60m.json",
+                "--tokenizer-model",
+                "t5-base",
+                "--data-path",
+                "0.5",
+                "datasets/c4-00000_text_document",
+                "0.5",
+                "datasets/c4-00001_text_document",
+                "--cache-dir",
+                "datasets",
+                "--batch-size",
+                "1",
+                "--train-iters",
+                "20",
+                "--eval-iters",
+                "1",
+                "--eval-interval",
+                "10",
+                "--save-dir",
+                "./example",
+                "--train-curriculum",
+                "0.3",
+                "0",
+                "0.3",
+                "1",
+                "0.2",
+                "0",
+                "0.2",
+                "1"
+            ]
+        }
+    ]
+}

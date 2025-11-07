@@ -62,6 +62,8 @@ def parse_args():
                         help='Learning rate (default: 1e-5)')
     parser.add_argument('--random-seed', type=int, default=42,
                         help='Random seed (default: 42)')
+    parser.add_argument('--train-curriculum', nargs='*', type=str, default=None,
+                        help='Curriculum schedule for training datasets (provide as value/id pairs, e.g., 0.3 0 0.7 1)')
     
     # Optional: checkpoint and logging
     parser.add_argument('--save-dir', type=str, default=None,
@@ -121,7 +123,7 @@ def main():
                     f"eval_interval={args.eval_interval}, eval_iters_per_eval={args.eval_iters}, "
                     f"total_evaluations={num_evals}, total_eval_iters={total_eval_iters}")
 
-    # PackTron data configuration
+
     config = PackTronConfig(
         path_to_cache=args.cache_dir,
         random_seed=args.random_seed,
@@ -129,8 +131,9 @@ def main():
         sequence_length=args.sequence_length,
         batch_size=args.batch_size,
         data_path=args.data_path,
-        train_iters=args.train_iters,
-        eval_iters=total_eval_iters,  # Total eval iterations across all evaluations
+        train_iters=args.train_iters * world_size,
+        eval_iters=total_eval_iters * world_size,  # Total eval iterations across all evaluations
+        train_curriculum=args.train_curriculum,
     )
 
     train_dataloader, eval_dataloader = create_dataloader(
@@ -151,7 +154,7 @@ def main():
     
     # Simple training loop
     for step, batch in enumerate(train_dataloader):
-        if step >= config.train_iters:
+        if step >= args.train_iters:
             break
             
         tokens = batch['tokens'].to(device)
@@ -177,7 +180,7 @@ def main():
         
         if (step + 1) % args.log_interval == 0:
             avg_loss = total_loss / num_batches
-            log_single_rank(logger, logging.INFO, f"Step {step + 1}/{config.train_iters}, Loss: {avg_loss:.4f}, "
+            log_single_rank(logger, logging.INFO, f"Step {step + 1}/{args.train_iters}, Loss: {avg_loss:.4f}, "
                         f"Batches processed: {num_batches}")
         
         # Evaluation

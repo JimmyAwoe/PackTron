@@ -4,6 +4,7 @@ PackTron Dataloader for LLM Training
 
 import os
 import logging
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from typing import Optional, List, Tuple
@@ -14,6 +15,7 @@ from packtron.utils import (
     GPTDataset,
     GPTDatasetConfig,
     get_blend_and_blend_per_split,
+    get_blend_from_list,
     log_single_rank,
 )
 
@@ -117,9 +119,9 @@ class PackTronDataset:
         log_single_rank(logger, logging.INFO, "Building datasets with BlendedMegatronDatasetBuilder")
         
         # Calculate sample sizes for training
-        train_samples = (self.config.train_iters + 10) * self.config.batch_size # ensure enough samples
-        valid_samples = (self.config.eval_iters + 10) * self.config.batch_size
-        train_val_test_num_samples = [train_samples, valid_samples, 0]
+        train_samples = (self.config.train_iters) * self.config.batch_size # ensure enough samples
+        valid_samples = (self.config.eval_iters) * self.config.batch_size
+        train_val_test_num_samples = [train_samples, valid_samples]
         
         def is_dataset_built_on_rank():
             return True  # Always build on current rank for our use case
@@ -135,8 +137,81 @@ class PackTronDataset:
         train_ds, valid_ds = builder.build()
         
         log_single_rank(logger, logging.INFO, f"Built dataset with {len(train_ds) if train_ds else 0} samples")
-        
+
+        # Apply optional curriculum schedule on the training dataset
+        self._apply_train_curriculum(train_ds)
+
         return train_ds, valid_ds
+
+    def _apply_train_curriculum(self, dataset) -> None:
+        schedule = self.config.train_curriculum
+        if not schedule:
+            return
+        
+        self._reorder_dataset_by_schedule(dataset, schedule)
+        log_single_rank(
+            logger,
+            logging.INFO,
+            "Applied training curriculum schedule to dataset indices"
+        )
+
+    def _reorder_dataset_by_schedule(self, dataset, schedule: str) -> None:
+        dataset_index = dataset.dataset_index
+        dataset_sample_index = dataset.dataset_sample_index
+
+        dataset_ids, fractions = get_blend_from_list(schedule)
+
+
+        total_samples = len(dataset_index)
+
+        fractions = np.array(fractions)
+        fractions = fractions / fractions.sum()
+
+        # Verify each dataset has enough samples
+        ratio_per_dataset = np.array(dataset.config.blend[1])
+        ratio_per_dataset = ratio_per_dataset / ratio_per_dataset.sum()
+        ratio_in_curriculum = np.zeros_like(ratio_per_dataset)
+        dataset_int_id = np.array([int(i) for i in dataset_ids])
+        for i in range(len(dataset.datasets)):
+            ratio_in_curriculum[i] = fractions[dataset_int_id== i].sum()
+
+        assert np.allclose(ratio_in_curriculum, ratio_per_dataset, atol=1e-8), "The ratio in data path should match that in curriculum."
+
+        # Prepare per-dataset positions preserving current order
+        dataset_index_np = np.asarray(dataset_index)
+        dataset_sample_index_np = np.asarray(dataset_sample_index)
+
+        available_positions = {}
+        for dataset_id in range(len(dataset.datasets)):
+            positions = np.nonzero(dataset_index_np == dataset_id)[0]
+            available_positions[str(dataset_id)] = positions
+
+        # Determine sample counts for each segment
+        counts: List[int] = []
+        assigned = 0
+        for normalized_fraction, dataset_id in zip(fractions, dataset_ids):
+            count = int(round(normalized_fraction * total_samples))
+            count = min(count, total_samples - assigned)
+            counts.append(count)
+            assigned += counts[-1]
+
+        new_dataset_index = np.empty_like(dataset_index_np)
+        new_dataset_sample_index = np.empty_like(dataset_sample_index_np)
+
+        current_pos = 0
+        pointers = {dataset_id: 0 for dataset_id in available_positions}
+
+        for dataset_id, count in zip(dataset_ids, counts):
+            positions = available_positions[dataset_id]
+            selected = positions[pointers[dataset_id]: pointers[dataset_id] + count]
+            new_dataset_index[current_pos: current_pos + count] = dataset_index_np[selected]
+            new_dataset_sample_index[current_pos: current_pos + count] = dataset_sample_index_np[selected]
+            pointers[dataset_id] += count
+            current_pos += count
+
+        # Write back into the original arrays to preserve memmap semantics
+        dataset_index[:] = new_dataset_index
+        dataset_sample_index[:] = new_dataset_sample_index
 
 
 def build_pretraining_data_loader(dataset, consumed_samples, batch_size,  
