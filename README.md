@@ -4,6 +4,8 @@
 
 ### **Efficient Sentence Packing for Large Language Model Training**
 
+[English](README.md) | [简体中文](README.zh.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.7+-orange.svg)](https://pytorch.org/)
@@ -221,15 +223,19 @@ for batch in train_loader:
 
 ### Step 4 (Optional): Script the Training Dataset Sequence
 
-Need to rotate between coding, math, physics, or other corpora at specific points of training? Set `train_curriculum` in the config (or pass `--train-curriculum` on the CLI):
+Need to rotate between coding, math, physics, or other corpora at specific points of training? Set `train_curriculum` in the config:
 
 ```python
 config = PackTronConfig(
     # ...other fields...
-    data_path="0.3 coding_data 0.3 math_data 0.4 physics_data", # 30% data should using coding, 30% for match and 40% for physics 
+    data_path="0.3 coding_data 0.3 math_data 0.4 physics_data",
     train_curriculum="0.2 0 0.2 1 0.2 2 0.1 0 0.1 1 0.2 2"  # 20% coding (dataset id 0), 20% math, 20% physics, 10% coding, 10% coding, 20% physics
 )
 ```
+
+Based on data_path setting, PackTron automatically allocates 30% of the required data to the coding dataset. If the source data is insufficient, PackTron will automatically pack it into several epochs util enough. Math and physics datasets follow the same logic.
+
+According the train_curriculum, PackTron segments the training data stream based on the curriculum's proportional stages: the first 20% uses coding (Dataset ID 0), followed by 20% of math, then 20% of physics, and so on.
 
 PackTron keeps the underlying Megatron-LM blends cached, then reorders `dataset_index` / `dataset_sample_index` in memory, so you can step through specialized data phases without re-tokenizing or rebuilding `.bin/.idx` files.
 
