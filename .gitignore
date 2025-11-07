@@ -1,3 +1,4 @@
 datasets
 packtron.egg-info/
 *.so
+.vscode/
