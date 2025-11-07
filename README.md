@@ -8,7 +8,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.7+-orange.svg)](https://pytorch.org/)
 
-**Zero Padding. Accurate Token Counting. Maximum Training Efficiency.**
+**Zero Padding | Staged Curriculum | Maximum Training Efficiency | Easy Implementation.**
 
 [Features](#-key-features) • [Why PackTron?](#-why-packtron) • [Quick Start](#-quick-start) • [Installation](#-installation) • [Documentation](#-documentation)
 
@@ -22,6 +22,11 @@
 - **No padding tokens** - All sequences are exactly `sequence_length` through intelligent sentence packing
 - **100% token utilization** - Every token in your dataset contributes to training
 - **Accurate token counting** - Know exactly how many tokens your model sees during training
+
+### 🎨 **Curriculum Control** 
+- **Staged Training Curriculum** - Instantly script the sequence and proportion of datasets to control training focus, for example, using specialized data (like code or math) at specific phases to boost model quality.
+- **Enhanced Model Quality** - Implement powerful curriculum learning techniques to improve the model's convergence behavior and final performance.
+- **Focused Learning** - Guarantee that the model is exposed to the most relevant, specialized data exactly when needed to optimize the learning curve.
 
 ### ⚡ **Production-Grade Performance**
 - **Binary storage format** - Pre-tokenized data stored as `.bin`/`.idx` files with memory-mapped I/O
@@ -40,18 +45,17 @@
 
 ### The Problem with Traditional Data Loading
 
-When training large language models with `transformers`' `load_dataset`, you typically face these issues:
+When training large language models with `datasets`' `load_dataset`, you typically face these issues:
 
 ```python
 # Traditional approach with transformers
 from datasets import load_dataset
 
 dataset = load_dataset("text", data_files="data.jsonl")
-# ❌ Sequences have variable lengths
 # ❌ Requires padding to batch_size × sequence_length
-# ❌ Padding tokens waste computation and memory
-# ❌ Cannot accurately count training tokens
-# ❌ Padding masks add complexity
+# ❌ Lacks automatic epoch construction
+# ❌ Poor flexibility in managing multi-stage data pipelines
+# ❌ No automatic data sharding across workers
 ```
 
 **Problems:**
@@ -61,10 +65,11 @@ dataset = load_dataset("text", data_files="data.jsonl")
 - 🚫 **Complex masking**: Need to handle attention masks for padding tokens
 - 🚫 **Manual multi-GPU setup**: Requires manual data sharding across GPUs for distributed training
 - 🚫 **Data exhaustion risk**: Training may stop unexpectedly if dataset runs out before completing all iterations
+- 🚫 **Lack of fine-grained data control**: Cannot easily implement staged training curriculum using different datasets
 
 ### The PackTron Solution
 
-PackTron solves all these problems by **packing multiple documents into fixed-length sequences**:
+PackTron fundamentally solves all these traditional bottlenecks by leveraging the **three-tier data loading architecture** inspired by Megatron-LM:
 
 ```python
 # PackTron approach
@@ -73,6 +78,7 @@ from packtron import create_dataloader, PackTronConfig
 config = PackTronConfig(
     train_iters=1000,  # PackTron automatically calculates epochs if data is insufficient
     eval_iters=100,
+    train_curriculum=[0.3, 0, 0.2, 1, 0.5, 0] # Setting the usage of different dataset in training
     ...
 )
 train_loader, eval_loader = create_dataloader(
@@ -81,10 +87,9 @@ train_loader, eval_loader = create_dataloader(
     world_size=2      # Total GPUs - data automatically distributed!
 )
 # ✅ All sequences are exactly sequence_length (no padding!)
-# ✅ 100% token utilization
-# ✅ Accurate token counting
-# ✅ Automatic distributed data sharding across GPUs
 # ✅ Guaranteed data availability (auto epoch calculation)
+# ✅ Flexible configuration of datasets for multi-stage training.
+# ✅ Automatic distributed data sharding across GPUs
 ```
 
 **Benefits:**
@@ -94,6 +99,7 @@ train_loader, eval_loader = create_dataloader(
 - ✅ **Simple**: No attention mask complexity for padding
 - ✅ **Automatic multi-GPU support**: Data automatically distributed across GPUs based on `world_size` - just pass `rank` and `world_size` to `create_dataloader`
 - ✅ **Guaranteed data availability**: Automatically calculates required epochs and repeats data if needed, ensuring training completes all `train_iters` without interruption
+- ✅ **Staged Learning Made Easy**: Control exactly when to use which dataset at runtime for efficient curriculum learning.
 
 ---
 
@@ -113,7 +119,7 @@ PackTron uses a **three-layer architecture** based on Megatron-LM's proven data 
 
 ### Layer 3: Dataset Blending (`BlendedDataset`)
 - Supports mixing multiple datasets with custom weights
-- Handles train/validation/test splits
+- Handles train/validation splits
 - Caches indices for fast subsequent loads
 
 ### The Packing Algorithm
@@ -130,7 +136,7 @@ This ensures:
 - No padding is ever needed
 - Document boundaries are preserved (with special tokens if needed)
 
-**PackTron's contribution**: We've simplified and lightweighted this powerful architecture, removing Megatron-specific dependencies and providing a clean, easy-to-use API that integrates seamlessly with `transformers` and other popular training frameworks.
+**PackTron's Contribution**: We have streamlined and optimized this powerful data architecture by eliminating Megatron-specific dependencies to provide a clean and easy-to-use API. Beyond this decoupling, we engineered a novel design that offers users unprecedented flexibility to configure data settings, ensuring seamless integration with transformers and other popular frameworks.
 
 ---
 
@@ -144,7 +150,7 @@ Convert your raw text data into PackTron's binary format:
 packtron-preprocess \
     --input data.jsonl \
     --output-prefix data \
-    --tokenizer-model gpt2 \
+    --tokenizer-model t5-base \
     --workers 4 \
     --append-eod
 ```
@@ -165,12 +171,13 @@ from packtron import PackTronConfig
 config = PackTronConfig(
     path_to_cache="./cache",           # Cache directory for indices
     split_config="98,2",               # Train:98%, Valid:2%
-    data_path="data",                   # Path prefix to .bin/.idx files
+    data_path="data",                  # Path prefix to .bin/.idx files
     train_iters=1000,                   # Number of training iterations
     eval_iters=100,                     # Total evaluation iterations
     sequence_length=4096,               # Fixed sequence length
     batch_size=4,                       # Batch size per GPU
-    random_seed=42                      # Random seed for reproducibility
+    random_seed=42,                     # Random seed for reproducibility
+    train_curriculum="0.5 0 0.5 1"     # Optional: schedule dataset ids over training (See Step 4)
 )
 ```
 
@@ -211,6 +218,20 @@ for batch in train_loader:
 ```
 
 **That's it!** Your data is now efficiently packed with zero padding.
+
+### Step 4 (Optional): Script the Training Dataset Sequence
+
+Need to rotate between coding, math, physics, or other corpora at specific points of training? Set `train_curriculum` in the config (or pass `--train-curriculum` on the CLI):
+
+```python
+config = PackTronConfig(
+    # ...other fields...
+    data_path="0.3 coding_data 0.3 math_data 0.4 physics_data", # 30% data should using coding, 30% for match and 40% for physics 
+    train_curriculum="0.2 0 0.2 1 0.2 2 0.1 0 0.1 1 0.2 2"  # 20% coding (dataset id 0), 20% math, 20% physics, 10% coding, 10% coding, 20% physics
+)
+```
+
+PackTron keeps the underlying Megatron-LM blends cached, then reorders `dataset_index` / `dataset_sample_index` in memory, so you can step through specialized data phases without re-tokenizing or rebuilding `.bin/.idx` files.
 
 ---
 
@@ -266,17 +287,18 @@ For detailed installation instructions, see [INSTALL.md](INSTALL.md).
 
 ### Complete Example
 
-See `example/llama_train.py` for a complete training example with:
+See `examples/llama_train.py` for a complete training example with:
 - Multi-GPU distributed training using `torchrun`
 - LLaMA model integration
 - Evaluation loop
 - Checkpoint saving
+- Dataset sequencing via `--train-curriculum`
 
 ```bash
 # Run with 2 GPUs
-torchrun --nproc-per-node=2 example/llama_train.py \
+torchrun --nproc-per-node=2 examples/llama_train.py \
     --model-config llama_60m.json \
-    --tokenizer-model meta-llama/Llama-2-7b-hf \
+    --tokenizer-model t5-base \
     --data-path data \
     --cache-dir ./cache \
     --split-config 98,2 \
@@ -284,8 +306,26 @@ torchrun --nproc-per-node=2 example/llama_train.py \
     --batch-size 4 \
     --train-iters 1000 \
     --eval-iters 10 \
-    --eval-interval 100
+    --eval-interval 100 \
+    --train-curriculum 0.3 0 0.3 1 0.2 0 0.2 1
 ```
+
+Need a turnkey example? `examples/run.sh` mirrors the command above so you can launch a staged training curriculum with one shell script.
+
+### Curriculum Scheduling Deep Dive
+
+`train_curriculum` accepts a series of `<fraction> <dataset_id>` pairs. PackTron normalizes the fractions, then draws each portion from the requested dataset **without touching the cached indices**. Example interpretation:
+
+```
+train_curriculum="0.3 0 0.3 1 0.2 0 0.2 1"
+```
+
+- The first 30% of steps use dataset `0`
+- The next 30% draw from dataset `1`
+- The following 20% return to dataset `0`
+- The final 20% complete on dataset `1`
+
+Unlike Hugging Face's `load_dataset`, PackTron doesn't require manual shuffling or repeated preprocessing—curriculum changes are applied instantly at runtime.
 
 ### API Reference
 
@@ -304,6 +344,7 @@ class PackTronConfig:
     sequence_length: int         # Sequence length for training samples
     batch_size: int             # Batch size per GPU
     random_seed: int = 1234     # Random seed for dataset shuffling
+    train_curriculum: Optional[str] = None # Optional curriculum schedule
 ```
 
 #### `create_dataloader`
@@ -332,6 +373,15 @@ from packtron import build_tokenizer
 
 tokenizer = build_tokenizer(args)  # args should have tokenizer_model attribute
 ```
+The args.tokenizer_model will be sent to 
+```python
+import transformers
+
+transformers.AutoTokenizer.from_pretrained(
+            pretrained_model_name_or_path=args.tokenizer_model, **kwargs
+        )
+```
+So you can use any tokenizer that HuggingFace support which achieve complete compatibility between transformers and PackTron.
 
 ---
 
@@ -347,6 +397,7 @@ tokenizer = build_tokenizer(args)  # args should have tokenizer_model attribute
 | **C++ Acceleration** | ✅ Yes | ❌ No | ✅ Yes |
 | **Auto Multi-GPU Distribution** | ✅ Automatic | ❌ Manual | ✅ Yes |
 | **Auto Epoch Management** | ✅ Yes | ❌ No | ✅ Yes |
+| **Runtime Dataset Sequencing** | ✅ Reorder without rebuild | ❌ Not supported | ⚠️ Requires custom scripting |
 
 ---
 

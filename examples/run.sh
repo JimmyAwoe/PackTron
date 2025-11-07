@@ -1,5 +1,5 @@
-torchrun --nproc-per-node=2 example/llama_train.py \
-    --model-config example/llama_60m.json \
+torchrun --nproc-per-node=2 examples/llama_train.py \
+    --model-config examples/llama_60m.json \
     --tokenizer-model t5-base \
     --data-path 0.5 datasets/c4-00000_text_document 0.4 datasets/c4-00001_text_document \
     --cache-dir datasets \
@@ -7,5 +7,5 @@ torchrun --nproc-per-node=2 example/llama_train.py \
     --train-iters 1000 \
     --eval-iters 10 \
     --eval-interval 100 \
-    --save-dir ./example \
+    --save-dir ./examples \
     --train-curriculum 0.3 0 0.3 1 0.2 0 0.2 1

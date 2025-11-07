@@ -210,8 +210,8 @@ class PackTronDataset:
             current_pos += count
 
         # Write back into the original arrays to preserve memmap semantics
-        dataset_index[:] = new_dataset_index
-        dataset_sample_index[:] = new_dataset_sample_index
+        dataset.dataset_index = new_dataset_index
+        dataset.dataset_sample_index = new_dataset_sample_index
 
 
 def build_pretraining_data_loader(dataset, consumed_samples, batch_size,  

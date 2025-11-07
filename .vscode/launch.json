@@ -16,7 +16,7 @@
                 "PYTHONPATH": "${workspaceFolder}"
             },
             "args": [
-                "--nproc-per-node=2",
+                "--nproc-per-node=1",
                 "example/llama_train.py",
                 "--model-config",
                 "example/llama_60m.json",
