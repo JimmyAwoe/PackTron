@@ -1,6 +1,9 @@
 <div align="center">
 
-# 🚀 PackTron
+<div style="display: inline-flex; align-items: center; gap: 10px;">
+        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50"/> 
+        <h1 style="margin: 0; padding: 0;"> PackTron</h1>
+</div>
 
 ### **Efficient Data Loader for Large Language Model Training**
 
@@ -25,10 +28,32 @@
 - **100% token utilization** - Every token in your dataset contributes to training
 - **Accurate token counting** - Know exactly how many tokens your model sees during training
 
+<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
+        <p>Figure 1：HuggingFace Dataloader</p>
+    </div>
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
+        <p>Figure 2：PackTron Dataloader</p>
+    </div>
+</div>
+
 ### 🎨 **Curriculum Control** 
 - **Staged Training Curriculum** - Instantly script the sequence and proportion of datasets to control training focus, for example, using specialized data (like code or math) at specific phases to boost model quality.
 - **Enhanced Model Quality** - Implement powerful curriculum learning techniques to improve the model's convergence behavior and final performance.
 - **Focused Learning** - Guarantee that the model is exposed to the most relevant, specialized data exactly when needed to optimize the learning curve.
+
+<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
+        <p>Figure 1：Flexible Curriculum Control</p>
+    </div>
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
+        <p>Figure 2：Automatically Data-Parallel Sharding </p>
+    </div>
+</div>
 
 ### ⚡ **Production-Grade Performance**
 - **Binary storage format** - Pre-tokenized data stored as `.bin`/`.idx` files with memory-mapped I/O
@@ -40,6 +65,7 @@
 - **Works with `transformers`** - Drop-in replacement for `load_dataset` in your existing training pipelines
 - **Simple API** - Three steps: preprocess → config → dataloader
 - **Lightweight** - Minimal dependencies, focused on core functionality
+
 
 ---
 
@@ -320,6 +346,7 @@ Need a turnkey example? `examples/run.sh` mirrors the command above so you can l
 
 ### Curriculum Scheduling Deep Dive
 
+
 `train_curriculum` accepts a series of `<fraction> <dataset_id>` pairs. PackTron normalizes the fractions, then draws each portion from the requested dataset **without touching the cached indices**. Example interpretation:
 
 ```
@@ -332,6 +359,7 @@ train_curriculum="0.3 0 0.3 1 0.2 0 0.2 1"
 - The final 20% complete on dataset `1`
 
 Unlike Hugging Face's `load_dataset`, PackTron doesn't require manual shuffling or repeated preprocessing—curriculum changes are applied instantly at runtime.
+
 
 ### API Reference
 

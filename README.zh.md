@@ -1,6 +1,9 @@
 <div align="center">
 
-# 🚀 PackTron
+<div style="display: inline-flex; align-items: center; gap: 10px;">
+        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50"/> 
+        <h1 style="margin: 0; padding: 0;"> PackTron</h1>
+</div>
 
 ### **用于大规模语言模型训练的高效数据加载器**
 
@@ -25,10 +28,32 @@
 - **100% Token利用率** - 数据集中每个token都参与训练
 - **准确的Token计数** - 精确掌握模型在训练中看到的token数量
 
+<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
+        <p>Figure 1：HuggingFace数据加载器</p>
+    </div>
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
+        <p>Figure 2：PackTron数据加载器</p>
+    </div>
+</div>
+
 ### 🎨 **细粒度数据配比控制**
 - **分阶段训练数据设置** - 灵活编排数据集使用顺序与占比，例如在特定阶段插入代码或数学数据以提升模型质量
 - **提升模型表现** - 轻松实现强大的数据配置策略，改进模型收敛和最终效果
 - **聚焦学习** - 确保模型在需要的时间点接触到最相关的专业数据
+
+<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
+        <p>Figure 1：灵活的控制数据配比</p>
+    </div>
+    <div style="flex: 1; text-align: center; padding: 0 10px;">
+        <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
+        <p>Figure 2：自动实现数据并行分片 </p>
+    </div>
+</div>
 
 ### ⚡ **生产级性能**
 - **二进制存储格式** - 预先分词的数据以 `.bin`/`.idx` 文件存储，支持内存映射 I/O
