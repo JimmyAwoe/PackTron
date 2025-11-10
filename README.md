@@ -2,7 +2,7 @@
 
 # 🚀 PackTron
 
-### **Efficient Sentence Packing for Large Language Model Training**
+### **Efficient Data Loader for Large Language Model Training**
 
 [English](README.md) | [简体中文](README.zh.md)
 
