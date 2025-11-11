@@ -1,17 +1,7 @@
 <div align="center">
 
 <div style="text-align: center; margin: 0; padding: 0;">
-    <div style="display: inline-block; vertical-align: middle;">
-        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50" style="vertical-align: middle; margin-right: 10px;"/>
-        <span style="
-            margin: 0; 
-            padding: 0; 
-            font-size: 2em; 
-            font-weight: bold; 
-            vertical-align: middle;
-            display: inline-block; 
-        ">PackTron</span>
-    </div>
+    <img src="figures/caption.png" alt="PackTron Logo" style="width: 400px; height: auto; display: block; margin: 0 auto;"/>
 </div>
 
 ### **用于大规模语言模型训练的高效数据加载器**
