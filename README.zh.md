@@ -1,8 +1,17 @@
 <div align="center">
 
-<div style="display: inline-flex; align-items: center; gap: 10px;">
-        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50"/> 
-        <h1 style="margin: 0; padding: 0;"> PackTron</h1>
+<div style="text-align: center; margin: 0; padding: 0;">
+    <div style="display: inline-block; vertical-align: middle;">
+        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50" style="vertical-align: middle; margin-right: 10px;"/>
+        <span style="
+            margin: 0; 
+            padding: 0; 
+            font-size: 2em; 
+            font-weight: bold; 
+            vertical-align: middle;
+            display: inline-block; 
+        ">PackTron</span>
+    </div>
 </div>
 
 ### **用于大规模语言模型训练的高效数据加载器**
@@ -13,7 +22,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.7+-orange.svg)](https://pytorch.org/)
 
-**零填充 | 细粒度数据配置 | 训练效率⬆️⬆️ | 高效集成**
+**零填充 | 细粒度数据配置 | 训练效率 ⬆️⬆️ | 高效集成**
 
 [关键特性](#-关键特性) • [为什么选择 PackTron?](#-为什么选择-packtron) • [快速上手](#-快速上手) • [安装](#-安装) • [文档](#-文档)
 
@@ -24,44 +33,36 @@
 ## 🎯 关键特性
 
 ### ✨ **零填充浪费**
-- **序列无填充** - 通过智能句子打包让所有序列都恰好为 `sequence_length`
-- **100% Token利用率** - 数据集中每个token都参与训练
-- **准确的Token计数** - 精确掌握模型在训练中看到的token数量
 
-<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
-        <p>HuggingFace数据加载器</p>
-    </div>
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
-        <p>PackTron数据加载器</p>
-    </div>
+- **序列无填充** - 通过智能句子打包让所有序列都恰好为 `sequence_length`
+- **100% Token 利用率** - 数据集中每个 token 都参与训练
+- **准确的 Token 计数** - 精确掌握模型在训练中看到的 token 数量
+
+<div style="margin-top: 20px; overflow: hidden;"> 
+    <div style="float: left; width: 98%; text-align: center; padding: 0 1%;">
+        <img src="figures/load.png" alt="diff load" style="max-width: 98%;"/>
 </div>
 
 ### 🎨 **细粒度数据配比控制**
+
 - **分阶段训练数据设置** - 灵活编排数据集使用顺序与占比，例如在特定阶段插入代码或数学数据以提升模型质量
 - **提升模型表现** - 轻松实现强大的数据配置策略，改进模型收敛和最终效果
 - **聚焦学习** - 确保模型在需要的时间点接触到最相关的专业数据
 
-<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
-        <p>灵活的控制数据配比</p>
-    </div>
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
-        <p>自动实现数据并行分片 </p>
-    </div>
+<div style="margin-top: 20px; overflow: hidden;"> 
+    <div style="float: left; width: 98%; text-align: center; padding: 0 1%;">
+        <img src="figures/advance_function.png" alt="improvement" style="max-width: 80%;"/>
 </div>
 
 ### ⚡ **生产级性能**
+
 - **二进制存储格式** - 预先分词的数据以 `.bin`/`.idx` 文件存储，支持内存映射 I/O
 - **C++ 加速索引** - 通过优化的 C++（pybind11）快速构建样本索引
 - **自动多 GPU 数据分发** - 按照 `world_size` 自动切分数据，告别手动配置
 - **智能 Epoch 管理** - 根据 `train_iters`/`eval_iters` 与数据规模自动计算并构建所需 epoch，确保训练永不中断
 
 ### 🔧 **易于集成**
+
 - **兼容 `transformers`** - 可无缝替换现有训练流程中的 `load_dataset`
 - **简单 API** - 三步即可：预处理 → 配置 → 加载器
 - **轻量依赖** - 只关注核心能力，安装简单
@@ -86,9 +87,10 @@ dataset = load_dataset("text", data_files="data.jsonl")
 ```
 
 **常见问题：**
-- 🚫 **填充浪费**：典型批次中 30-50% 的token都是填充
-- 🚫 **指标不准确**：token计数包含padding token，难以追踪真实训练进度
-- 🚫 **内存效率低**：padding token占用显存却不提供有效学习信号
+
+- 🚫 **填充浪费**：典型批次中 30-50% 的 token 都是填充
+- 🚫 **指标不准确**：token 计数包含 padding token，难以追踪真实训练进度
+- 🚫 **内存效率低**：padding token 占用显存却不提供有效学习信号
 - 🚫 **掩码复杂**：还需处理填充令牌的注意力掩码
 - 🚫 **多 GPU 手动分发**：分布式训练时必须手动切分数据
 - 🚫 **数据耗尽风险**：若数据不足，训练可能提前停止,造成训练失败
@@ -120,6 +122,7 @@ train_loader, eval_loader = create_dataloader(
 ```
 
 **核心优势：**
+
 - ✅ **零填充**：每个序列恰好为 `sequence_length`
 - ✅ **真实指标**：只统计有效令牌
 - ✅ **显存友好**：避免填充占用 GPU 内存
@@ -135,16 +138,19 @@ train_loader, eval_loader = create_dataloader(
 PackTron 采用 Megatron-LM 验证过的 **三层数据加载架构**：
 
 ### 第一层：二进制存储 (`IndexedDataset`)
+
 - 将原始文本预处理为分词后的二进制格式（`.bin`/`.idx`）
 - 使用内存映射 I/O 实现高效随机访问
 - 按令牌 ID 存储文档
 
 ### 第二层：句子打包 (`GPTDataset`)
+
 - 将多个文档智能打包到固定长度序列
 - 借助 C++ 加速快速构建样本索引
 - 处理文档边界并确保序列对齐
 
 ### 第三层：数据集混合 (`BlendedDataset`)
+
 - 支持按自定义权重混合多个数据集
 - 管理训练/验证划分
 - 缓存索引以加速后续加载
@@ -159,6 +165,7 @@ PackTron 使用 **Megatron-LM 成熟的句子打包算法**，同时简化 Megat
 4. **索引构建**：C++ 代码生成高效查找索引，便于快速采样
 
 这意味着：
+
 - 每个序列长度都相同
 - 完全不需要填充
 - 如果需要可保留文档边界
@@ -183,6 +190,7 @@ packtron-preprocess \
 ```
 
 生成的二进制文件包括：
+
 - `data_text_document.bin` / `data_text_document.idx` - 分词后的二进制数据
 
 **说明**：输出格式为 `{output_prefix}_{json_key}_{level}.bin/idx`。默认 `json_key` 为 `"text"`，`level` 为 `"document"`（如果使用 `--split-sentences` 则为 `"sentence"`）。
@@ -237,7 +245,7 @@ for batch in train_loader:
     tokens = batch['tokens']        # 形状：[batch_size, sequence_length]
     labels = batch['labels']        # 形状：[batch_size, sequence_length]
     attention_mask = batch['attention_mask'].float()  # 形状：[batch_size, sequence_length]
-    
+
     # 无需填充！所有序列自动拼接
     outputs = model(input_ids=tokens, attention_mask=attention_mask, labels=labels)
     loss = outputs.loss
@@ -252,14 +260,14 @@ for batch in train_loader:
 ```python
 config = PackTronConfig(
     # ...其他字段...
-    data_path="0.3 coding_data 0.3 math_data 0.4 physics_data", 
+    data_path="0.3 coding_data 0.3 math_data 0.4 physics_data",
     train_curriculum="0.2 0 0.2 1 0.2 2 0.1 0 0.1 1 0.2 2"
 )
 ```
 
-基于上述config的data_path设置，PackTron 自动将 30% 的数据需求分配给 coding 数据集，若数据源不足以提供数据需求要求的数据，系统将自动将其打包为多个epoch，直到足够满足需求。math 和 physics 数据集亦遵循相同的逻辑。
+基于上述 config 的 data_path 设置，PackTron 自动将 30% 的数据需求分配给 coding 数据集，若数据源不足以提供数据需求要求的数据，系统将自动将其打包为多个 epoch，直到足够满足需求。math 和 physics 数据集亦遵循相同的逻辑。
 
-train_curriculum的设置会要求PackTron 将训练数据流按比例阶段性划分：前 20% 使用 coding (数据集 ID 0)，随后 20% 使用 math，接着 20% 使用 physics，以此类推。
+train_curriculum 的设置会要求 PackTron 将训练数据流按比例阶段性划分：前 20% 使用 coding (数据集 ID 0)，随后 20% 使用 math，接着 20% 使用 physics，以此类推。
 
 PackTron 会复用缓存的 Megatron-LM 混合索引，只需在内存中重新排序 `dataset_index` / `dataset_sample_index`，即可在不重新分词或重建 `.bin/.idx` 的情况下切换数据阶段。
 
@@ -318,6 +326,7 @@ python -c "from packtron import create_dataloader, PackTronConfig; print('✓ In
 ### 完整示例
 
 参见 `examples/llama_train.py`，其中包含：
+
 - 使用 `torchrun` 的多 GPU 分布式训练
 - 集成 LLaMA 模型
 - 验证循环
@@ -351,6 +360,7 @@ train_curriculum="0.3 0 0.3 1 0.2 0 0.2 1"
 ```
 
 解释如下：
+
 - 前 30% 训练步骤使用数据集 `0`
 - 接下来的 30% 使用数据集 `1`
 - 随后 20% 再回到数据集 `0`
@@ -421,17 +431,17 @@ transformers.AutoTokenizer.from_pretrained(
 
 ## 🆚 与其他方案对比
 
-| 特性 | PackTron | `datasets.load_dataset` | Megatron-LM |
-|------|----------|------------------------------|-------------|
-| **零填充** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |
-| **准确令牌计数** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |
-| **易于集成** | ✅ API 简洁 | ✅ 简洁 | ❌ 复杂 |
-| **轻量级** | ✅ 依赖少 | ✅ 依赖少 | ❌ 依赖重 |
-| **二进制格式** | ✅ 快速 I/O | ❌ 文本格式 | ✅ 快速 I/O |
-| **C++ 加速** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |
-| **自动多 GPU 分发** | ✅ 自动 | ❌ 手动 | ✅ 支持 |
-| **自动 Epoch 管理** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |
-| **灵活数据配置** | ✅ 重新排序无需重建 | ❌ 不支持 | ⚠️ 需自定义脚本 |
+| 特性                | PackTron            | `datasets.load_dataset` | Megatron-LM     |
+| ------------------- | ------------------- | ----------------------- | --------------- |
+| **零填充**          | ✅ 支持             | ❌ 不支持               | ✅ 支持         |
+| **准确令牌计数**    | ✅ 支持             | ❌ 不支持               | ✅ 支持         |
+| **易于集成**        | ✅ API 简洁         | ✅ 简洁                 | ❌ 复杂         |
+| **轻量级**          | ✅ 依赖少           | ✅ 依赖少               | ❌ 依赖重       |
+| **二进制格式**      | ✅ 快速 I/O         | ❌ 文本格式             | ✅ 快速 I/O     |
+| **C++ 加速**        | ✅ 支持             | ❌ 不支持               | ✅ 支持         |
+| **自动多 GPU 分发** | ✅ 自动             | ❌ 手动                 | ✅ 支持         |
+| **自动 Epoch 管理** | ✅ 支持             | ❌ 不支持               | ✅ 支持         |
+| **灵活数据配置**    | ✅ 重新排序无需重建 | ❌ 不支持               | ⚠️ 需自定义脚本 |
 
 ---
 
@@ -480,7 +490,6 @@ PackTron 非常适合：
 
 **Made with ❤️ for the LLM community**
 
-⭐ 如果你觉得有帮助，欢迎为仓库点个Star！
+⭐ 如果你觉得有帮助，欢迎为仓库点个 Star！
 
 </div>
-

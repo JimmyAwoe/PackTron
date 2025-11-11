@@ -1,8 +1,17 @@
 <div align="center">
 
-<div style="display: inline-flex; align-items: center; gap: 10px;">
-        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50"/> 
-        <h1 style="margin: 0; padding: 0;"> PackTron</h1>
+<div style="text-align: center; margin: 0; padding: 0;">
+    <div style="display: inline-block; vertical-align: middle;">
+        <img src="figures/logo.png" alt="PackTron Logo" width="50" height="50" style="vertical-align: middle; margin-right: 10px;"/>
+        <span style="
+            margin: 0; 
+            padding: 0; 
+            font-size: 2em; 
+            font-weight: bold; 
+            vertical-align: middle;
+            display: inline-block; 
+        ">PackTron</span>
+    </div>
 </div>
 
 ### **Efficient Data Loader for Large Language Model Training**
@@ -24,48 +33,39 @@
 ## 🎯 Key Features
 
 ### ✨ **Zero Padding Waste**
+
 - **No padding tokens** - All sequences are exactly `sequence_length` through intelligent sentence packing
 - **100% token utilization** - Every token in your dataset contributes to training
 - **Accurate token counting** - Know exactly how many tokens your model sees during training
 
-<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
-        <p>HuggingFace Dataloader</p>
-    </div>
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
-        <p>PackTron Dataloader</p>
-    </div>
+<div style="margin-top: 20px; overflow: hidden;"> 
+    <div style="float: left; width: 98%; text-align: center; padding: 0 1%;">
+        <img src="figures/load.png" alt="diff load" style="max-width: 98%;"/>
 </div>
 
-### 🎨 **Curriculum Control** 
+### 🎨 **Curriculum Control**
+
 - **Staged Training Curriculum** - Instantly script the sequence and proportion of datasets to control training focus, for example, using specialized data (like code or math) at specific phases to boost model quality.
 - **Enhanced Model Quality** - Implement powerful curriculum learning techniques to improve the model's convergence behavior and final performance.
 - **Focused Learning** - Guarantee that the model is exposed to the most relevant, specialized data exactly when needed to optimize the learning curve.
 
-<div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
-        <p>Flexible Curriculum Control</p>
-    </div>
-    <div style="flex: 1; text-align: center; padding: 0 10px;">
-        <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
-        <p>Automatically Data-Parallel Sharding </p>
-    </div>
+<div style="margin-top: 20px; overflow: hidden;"> 
+    <div style="float: left; width: 98%; text-align: center; padding: 0 1%;">
+        <img src="figures/advance_function.png" alt="improvement" style="max-width: 80%;"/>
 </div>
 
 ### ⚡ **Production-Grade Performance**
+
 - **Binary storage format** - Pre-tokenized data stored as `.bin`/`.idx` files with memory-mapped I/O
 - **C++ accelerated indexing** - Fast sample index building using optimized C++ code (via pybind11)
 - **Automatic multi-GPU data distribution** - Automatically shards data across GPUs based on `world_size` for data parallelism (no manual setup needed)
 - **Smart epoch management** - Automatically calculates and builds required epochs based on `train_iters`/`eval_iters` and data size, ensuring training never runs out of data
 
 ### 🔧 **Easy Integration**
+
 - **Works with `transformers`** - Drop-in replacement for `load_dataset` in your existing training pipelines
 - **Simple API** - Three steps: preprocess → config → dataloader
 - **Lightweight** - Minimal dependencies, focused on core functionality
-
 
 ---
 
@@ -87,6 +87,7 @@ dataset = load_dataset("text", data_files="data.jsonl")
 ```
 
 **Problems:**
+
 - 🚫 **Padding waste**: Up to 30-50% of tokens can be padding in typical batches
 - 🚫 **Inaccurate metrics**: Token counts include padding, making it hard to track real training progress
 - 🚫 **Memory inefficiency**: Padding consumes GPU memory without contributing to learning
@@ -110,7 +111,7 @@ config = PackTronConfig(
     ...
 )
 train_loader, eval_loader = create_dataloader(
-    tokenizer, config, 
+    tokenizer, config,
     rank=0,           # Current GPU rank
     world_size=2      # Total GPUs - data automatically distributed!
 )
@@ -121,6 +122,7 @@ train_loader, eval_loader = create_dataloader(
 ```
 
 **Benefits:**
+
 - ✅ **Zero padding**: Every sequence is exactly `sequence_length` tokens
 - ✅ **Accurate metrics**: Count real training tokens, not padding
 - ✅ **Memory efficient**: No wasted memory on padding
@@ -136,16 +138,19 @@ train_loader, eval_loader = create_dataloader(
 PackTron uses a **three-layer architecture** based on Megatron-LM's proven data loading design:
 
 ### Layer 1: Binary Storage (`IndexedDataset`)
+
 - Pre-processes raw text into tokenized binary format (`.bin`/`.idx` files)
 - Uses memory-mapped I/O for efficient random access
 - Stores documents as sequences of token IDs
 
 ### Layer 2: Sentence Packing (`GPTDataset`)
+
 - Intelligently packs multiple documents into fixed-length sequences
 - Uses C++-accelerated indexing for fast sample construction
 - Handles document boundaries and sequence alignment
 
 ### Layer 3: Dataset Blending (`BlendedDataset`)
+
 - Supports mixing multiple datasets with custom weights
 - Handles train/validation splits
 - Caches indices for fast subsequent loads
@@ -160,6 +165,7 @@ PackTron leverages **Megatron-LM's proven sentence packing architecture**, makin
 4. **Index Building**: C++ code builds efficient lookup indices for fast sampling
 
 This ensures:
+
 - Every sequence is exactly `sequence_length` tokens
 - No padding is ever needed
 - Document boundaries are preserved (with special tokens if needed)
@@ -184,9 +190,10 @@ packtron-preprocess \
 ```
 
 This creates binary files:
+
 - `data_text_document.bin` / `data_text_document.idx` - Tokenized data in binary format
 
-**Note**: The output format is `{output_prefix}_{json_key}_{level}.bin/idx`. 
+**Note**: The output format is `{output_prefix}_{json_key}_{level}.bin/idx`.
 By default, `json_key` is `"text"` and `level` is `"document"` (or `"sentence"` if `--split-sentences` is used).
 
 ### Step 2: Configure PackTron
@@ -239,7 +246,7 @@ for batch in train_loader:
     tokens = batch['tokens']        # Shape: [batch_size, sequence_length]
     labels = batch['labels']        # Shape: [batch_size, sequence_length]
     attention_mask = batch['attention_mask'].float()  # Shape: [batch_size, sequence_length]
-    
+
     # No padding! All sequences are exactly sequence_length
     outputs = model(input_ids=tokens, attention_mask=attention_mask, labels=labels)
     loss = outputs.loss
@@ -320,6 +327,7 @@ For detailed installation instructions, see [INSTALL.md](INSTALL.md).
 ### Complete Example
 
 See `examples/llama_train.py` for a complete training example with:
+
 - Multi-GPU distributed training using `torchrun`
 - LLaMA model integration
 - Evaluation loop
@@ -346,7 +354,6 @@ Need a turnkey example? `examples/run.sh` mirrors the command above so you can l
 
 ### Curriculum Scheduling Deep Dive
 
-
 `train_curriculum` accepts a series of `<fraction> <dataset_id>` pairs. PackTron normalizes the fractions, then draws each portion from the requested dataset **without touching the cached indices**. Example interpretation:
 
 ```
@@ -359,7 +366,6 @@ train_curriculum="0.3 0 0.3 1 0.2 0 0.2 1"
 - The final 20% complete on dataset `1`
 
 Unlike Hugging Face's `load_dataset`, PackTron doesn't require manual shuffling or repeated preprocessing—curriculum changes are applied instantly at runtime.
-
 
 ### API Reference
 
@@ -407,7 +413,9 @@ from packtron import build_tokenizer
 
 tokenizer = build_tokenizer(args)  # args should have tokenizer_model attribute
 ```
-The args.tokenizer_model will be sent to 
+
+The args.tokenizer_model will be sent to
+
 ```python
 import transformers
 
@@ -415,23 +423,24 @@ transformers.AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=args.tokenizer_model, **kwargs
         )
 ```
+
 So you can use any tokenizer that HuggingFace support which achieve complete compatibility between transformers and PackTron.
 
 ---
 
 ## 🆚 Comparison with Alternatives
 
-| Feature | PackTron | `datasets.load_dataset` | Megatron-LM |
-|---------|----------|------------------------------|-------------|
-| **Zero Padding** | ✅ Yes | ❌ No | ✅ Yes |
-| **Accurate Token Count** | ✅ Yes | ❌ No | ✅ Yes |
-| **Easy Integration** | ✅ Simple API | ✅ Simple | ❌ Complex |
-| **Lightweight** | ✅ Minimal deps | ✅ Minimal deps | ❌ Heavy |
-| **Binary Format** | ✅ Fast I/O | ❌ Text-based | ✅ Fast I/O |
-| **C++ Acceleration** | ✅ Yes | ❌ No | ✅ Yes |
-| **Auto Multi-GPU Distribution** | ✅ Automatic | ❌ Manual | ✅ Yes |
-| **Auto Epoch Management** | ✅ Yes | ❌ No | ✅ Yes |
-| **Runtime Dataset Sequencing** | ✅ Reorder without rebuild | ❌ Not supported | ⚠️ Requires custom scripting |
+| Feature                         | PackTron                   | `datasets.load_dataset` | Megatron-LM                  |
+| ------------------------------- | -------------------------- | ----------------------- | ---------------------------- |
+| **Zero Padding**                | ✅ Yes                     | ❌ No                   | ✅ Yes                       |
+| **Accurate Token Count**        | ✅ Yes                     | ❌ No                   | ✅ Yes                       |
+| **Easy Integration**            | ✅ Simple API              | ✅ Simple               | ❌ Complex                   |
+| **Lightweight**                 | ✅ Minimal deps            | ✅ Minimal deps         | ❌ Heavy                     |
+| **Binary Format**               | ✅ Fast I/O                | ❌ Text-based           | ✅ Fast I/O                  |
+| **C++ Acceleration**            | ✅ Yes                     | ❌ No                   | ✅ Yes                       |
+| **Auto Multi-GPU Distribution** | ✅ Automatic               | ❌ Manual               | ✅ Yes                       |
+| **Auto Epoch Management**       | ✅ Yes                     | ❌ No                   | ✅ Yes                       |
+| **Runtime Dataset Sequencing**  | ✅ Reorder without rebuild | ❌ Not supported        | ⚠️ Requires custom scripting |
 
 ---
 
@@ -483,4 +492,3 @@ Note: This project contains code derived from Megatron-LM (NVIDIA), which is lic
 ⭐ Star this repo if you find it useful!
 
 </div>
-
