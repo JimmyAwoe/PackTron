@@ -31,11 +31,11 @@
 <div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
-        <p>Figure 1：HuggingFace数据加载器</p>
+        <p>HuggingFace数据加载器</p>
     </div>
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
-        <p>Figure 2：PackTron数据加载器</p>
+        <p>PackTron数据加载器</p>
     </div>
 </div>
 
@@ -47,11 +47,11 @@
 <div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
-        <p>Figure 1：灵活的控制数据配比</p>
+        <p>灵活的控制数据配比</p>
     </div>
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
-        <p>Figure 2：自动实现数据并行分片 </p>
+        <p>自动实现数据并行分片 </p>
     </div>
 </div>
 
@@ -421,7 +421,7 @@ transformers.AutoTokenizer.from_pretrained(
 
 ## 🆚 与其他方案对比
 
-| 特性 | PackTron | `transformers.load_dataset` | Megatron-LM |
+| 特性 | PackTron | `datasets.load_dataset` | Megatron-LM |
 |------|----------|------------------------------|-------------|
 | **零填充** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |
 | **准确令牌计数** | ✅ 支持 | ❌ 不支持 | ✅ 支持 |

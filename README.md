@@ -31,11 +31,11 @@
 <div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/hf_load.png" alt="trad hf load" style="max-width: 100%;"/>
-        <p>Figure 1：HuggingFace Dataloader</p>
+        <p>HuggingFace Dataloader</p>
     </div>
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/pck_load.png" alt="packtron load" style="max-width: 100%;"/>
-        <p>Figure 2：PackTron Dataloader</p>
+        <p>PackTron Dataloader</p>
     </div>
 </div>
 
@@ -47,11 +47,11 @@
 <div style="display: flex; justify-content: space-around; align-items: flex-start; margin-top: 20px;">
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/flexible_curriculum.png" alt="Flexible Curriculum Control" style="max-width: 80%;"/>
-        <p>Figure 1：Flexible Curriculum Control</p>
+        <p>Flexible Curriculum Control</p>
     </div>
     <div style="flex: 1; text-align: center; padding: 0 10px;">
         <img src="figures/dp_sharding.png" alt="Automatically Data-Parallel Sharding" style="max-width: 80%;"/>
-        <p>Figure 2：Automatically Data-Parallel Sharding </p>
+        <p>Automatically Data-Parallel Sharding </p>
     </div>
 </div>
 
@@ -421,7 +421,7 @@ So you can use any tokenizer that HuggingFace support which achieve complete com
 
 ## 🆚 Comparison with Alternatives
 
-| Feature | PackTron | `transformers.load_dataset` | Megatron-LM |
+| Feature | PackTron | `datasets.load_dataset` | Megatron-LM |
 |---------|----------|------------------------------|-------------|
 | **Zero Padding** | ✅ Yes | ❌ No | ✅ Yes |
 | **Accurate Token Count** | ✅ Yes | ❌ No | ✅ Yes |
